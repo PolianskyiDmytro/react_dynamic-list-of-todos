@@ -18,27 +18,25 @@ export const App: React.FC = () => {
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
   useEffect(() => {
-    const handleStatus = (currTodos: Todo[]) => {
-      if (status === 'all') {
-        return currTodos;
-      } else if (status === 'active') {
-        return currTodos.filter(todo => !todo.completed);
-      }
-
-      return currTodos.filter(todo => todo.completed);
-    };
-
     setIsLoading(true);
     getTodos()
-      .then(currTodos =>
-        setTodos(
-          handleStatus(currTodos).filter(todo =>
-            todo.title.toLowerCase().includes(query.trimStart().toLowerCase()),
-          ),
-        ),
-      )
+      .then(setTodos)
       .finally(() => setIsLoading(false));
-  }, [status, query]);
+  }, []);
+
+  const handleStatus = (currTodos: Todo[]) => {
+    if (status === 'all') {
+      return currTodos;
+    } else if (status === 'active') {
+      return currTodos.filter(todo => !todo.completed);
+    }
+
+    return currTodos.filter(todo => todo.completed);
+  };
+
+  const filteredTodos = handleStatus(todos).filter(todo =>
+    todo.title.toLowerCase().includes(query.trimStart().toLowerCase()),
+  );
 
   return (
     <>
@@ -61,7 +59,7 @@ export const App: React.FC = () => {
                 <Loader />
               ) : (
                 <TodoList
-                  todos={todos}
+                  todos={filteredTodos}
                   selectedTodo={selectedTodo}
                   setSelectedTodo={setSelectedTodo}
                 />
